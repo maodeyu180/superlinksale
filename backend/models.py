@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
 from datetime import datetime
 from .database import Base
 
@@ -12,6 +12,8 @@ class Link(Base):
     description = Column(Text)
     expire_at = Column(DateTime, nullable=True)
     click_count = Column(Integer, default=0)
+    max_clicks = Column(Integer, nullable=True, default=None)
+    is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

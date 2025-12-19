@@ -3,6 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATABASE_DIR = Path("data")
 DATABASE_DIR.mkdir(exist_ok=True)

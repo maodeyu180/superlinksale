@@ -7,12 +7,14 @@ class LinkCreate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     expire_at: Optional[datetime] = None
+    max_clicks: Optional[int] = None
 
 class LinkUpdate(BaseModel):
     original_url: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
     expire_at: Optional[datetime] = None
+    max_clicks: Optional[int] = None
 
 class LinkResponse(BaseModel):
     id: int
@@ -22,6 +24,7 @@ class LinkResponse(BaseModel):
     description: Optional[str]
     expire_at: Optional[datetime]
     click_count: int
+    max_clicks: Optional[int]
     created_at: datetime
     updated_at: datetime
 

@@ -236,13 +236,15 @@ function closeLinkModal() {
 
 document.getElementById('linkForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const linkId = document.getElementById('linkId').value;
+    const maxClicksValue = document.getElementById('linkMaxClicks').value;
     const data = {
         original_url: document.getElementById('linkOriginalUrl').value,
         title: document.getElementById('linkTitle').value || null,
         description: document.getElementById('linkDescription').value || null,
-        expire_at: document.getElementById('linkExpireAt').value || null
+        expire_at: document.getElementById('linkExpireAt').value || null,
+        max_clicks: maxClicksValue ? parseInt(maxClicksValue) : null
     };
     
     try {
@@ -294,7 +296,9 @@ async function editLink(shortCode) {
             } else {
                 document.getElementById('linkExpireAt').value = '';
             }
-            
+
+            document.getElementById('linkMaxClicks').value = link.max_clicks || '';
+
             document.getElementById('linkModal').style.display = 'flex';
         }
     } catch (error) {

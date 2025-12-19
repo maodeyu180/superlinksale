@@ -64,13 +64,14 @@ def create_link(
     short_code = generate_short_code()
     while db.query(models.Link).filter(models.Link.short_code == short_code).first():
         short_code = generate_short_code()
-    
+
     db_link = models.Link(
         short_code=short_code,
         original_url=link.original_url,
         title=link.title,
         description=link.description,
-        expire_at=link.expire_at
+        expire_at=link.expire_at,
+        max_clicks=link.max_clicks
     )
     db.add(db_link)
     db.commit()
@@ -84,7 +85,7 @@ def get_links(
     db: Session = Depends(get_db),
     _: dict = Depends(verify_token)
 ):
-    links = db.query(models.Link).offset(skip).limit(limit).all()
+    links = db.query(models.Link).filter(models.Link.is_deleted == False).offset(skip).limit(limit).all()
     return links
 
 @app.get("/api/links/{short_code}", response_model=schemas.LinkResponse)
@@ -140,8 +141,9 @@ def delete_link(
     link = db.query(models.Link).filter(models.Link.short_code == short_code).first()
     if not link:
         raise HTTPException(status_code=404, detail="Link not found")
-    
-    db.delete(link)
+
+    link.is_deleted = True
+    link.updated_at = datetime.utcnow()
     db.commit()
     return {"message": "Link deleted successfully"}
 
@@ -215,11 +217,14 @@ def delete_template(
 async def link_preview(short_code: str, db: Session = Depends(get_db)):
     link = db.query(models.Link).filter(models.Link.short_code == short_code).first()
 
-    if not link:
+    if not link or link.is_deleted:
         raise HTTPException(status_code=404, detail="Link not found")
 
     if link.expire_at and link.expire_at < datetime.utcnow():
         raise HTTPException(status_code=410, detail="Link has expired")
+
+    if link.max_clicks is not None and link.click_count >= link.max_clicks:
+        raise HTTPException(status_code=403, detail="Link has reached maximum clicks")
 
     link.click_count += 1
     db.commit()
@@ -240,11 +245,14 @@ async def link_preview(short_code: str, db: Session = Depends(get_db)):
 async def view_link(short_code: str, db: Session = Depends(get_db)):
     link = db.query(models.Link).filter(models.Link.short_code == short_code).first()
 
-    if not link:
+    if not link or link.is_deleted:
         raise HTTPException(status_code=404, detail="Link not found")
 
     if link.expire_at and link.expire_at < datetime.utcnow():
         raise HTTPException(status_code=410, detail="Link has expired")
+
+    if link.max_clicks is not None and link.click_count >= link.max_clicks:
+        raise HTTPException(status_code=403, detail="Link has reached maximum clicks")
 
     link.click_count += 1
     db.commit()

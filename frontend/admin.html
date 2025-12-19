@@ -198,6 +198,12 @@
                     <small class="form-hint">留空则永不过期</small>
                 </div>
 
+                <div class="form-group">
+                    <label>点击次数限制</label>
+                    <input type="number" id="linkMaxClicks" class="form-input" placeholder="留空则不限制" min="1">
+                    <small class="form-hint">达到限制次数后将无法访问</small>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeLinkModal()">取消</button>
                     <button type="submit" class="btn-primary">
